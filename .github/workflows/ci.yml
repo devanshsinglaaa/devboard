@@ -1,5 +1,4 @@
 #Goal: Build the image for Devboard frontend and push to Docker Hub
-
 name: CI
 
 on: 
