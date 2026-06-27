@@ -1,30 +1,38 @@
-# Stage 1 (Builder stage) - USed to build the packages & app
-FROM node:24 as builder
+# Stage 1 : Builder stage used to build packages and install
 
-# This will create a folder app and make it as pwd
+# This is base image of node
+FROM node:24 AS builder
+
+# This will create /app folder as pwd
 WORKDIR /app
 
-# This will copy all the code
-COPY . . 
+#This will copy files from project to pwd
+COPY . .
 
-# This will install all the packages
+#install node package.json
 RUN npm install
 
 # This will create a folder called /dist
 RUN npm run build
 
-# --------------- STAGE 1 COMPLETE -----------
+# ---------- STAGE 1 COMPLETE ----------
 
-# Stage 2 (Runner Stage) - SUed to run the application from the builder stage
+# Stage 2 Runner - Used to run application from builder stage
+
 FROM node:24-alpine AS runner
 
 WORKDIR /app
 
 COPY package.json .
 
-RUN npm install -g vite
+run npm install -g vite
 
 COPY --from=builder /app/dist ./dist
 
+EXPOSE 5174
 
-CMD ["npm","run","preview", "--", "--host", "0.0.0.0", "--port", "4173"]
+CMD ["npm","run","preview","--","--host","0.0.0.0","--port","5174"]
+
+
+
+
