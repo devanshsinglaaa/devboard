@@ -1,49 +1,32 @@
-#Goal: Build the image for Devboard frontend and push to Docker Hub, after linting the code
+#Goal : i have to lint, build, test the code for frontend and backend,
+#then push the Images to docker HUb.
+
 name: CI
 
-on: 
+on:
   push:
     branches: [master]
 
 jobs:
-  code-lint:
+
+  frontend:
     runs-on: ubuntu-latest
     steps:
-      - name: CheckoutCodeforLinting
-        uses: actions/checkout@v4
-        
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
+      - name: Code Checkout
+        uses: actions/checkout@v7
+      - name: Set up NodeJSgi
+        uses: actions/setup-node@v6
         with:
-          node-version: 22
-
-      - name: Install dependencies
-        working-directory: ./frontend
+          node-version: '20'
+          chache: npm
+          chache-dependency-path: frontend/package-lock.json
+      - name: Install npm packages
         run: npm ci
-
-      - name: Run ESLint
-        working-directory: ./frontend
+      - name: Run Linter
         run: npm run lint
-        
+      - name: RUN Tests
+        run: npm run test
 
 
-  build-and-push:
-    needs: code-lint
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout Code
-        uses: actions/checkout@v4
 
-      - name: Docker Setup [Login]
-        uses: docker/login-action@v4
-        with:
-          username: ${{ vars.DOCKERHUB_USERNAME }}
-          password: ${{ secrets.DOCKERHUB_TOKEN }}
-
-      - name: Docker build and push
-        uses: docker/build-push-action@v7
-        with:
-          context: ./frontend
-          file: ./frontend/Dockerfile
-          push: true
-          tags: ${{ vars.DOCKERHUB_USERNAME }}/devboard-fe-master:latest
+  backend:
