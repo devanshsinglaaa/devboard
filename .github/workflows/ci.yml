@@ -14,18 +14,35 @@ jobs:
     steps:
       - name: Code Checkout
         uses: actions/checkout@v7
+
       - name: Set up NodeJSgi
         uses: actions/setup-node@v6
         with:
           node-version: '20'
           chache: npm
           chache-dependency-path: frontend/package-lock.json
+
       - name: Install npm packages
         run: npm install
         working-directory: frontend
+
       - name: Run Linter
         run: npm run lint
         working-directory: frontend
+
       - name: RUN Tests
         run: npm run test
         working-directory: frontend
+
+      - name: Docker Setup [Login]
+        uses: docker/login-action@v4
+        with:
+          username: ${{ vars.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Docker Build and Push
+        uses: docker/build-push-action@v7
+        with:
+          context: ./frontend
+          push: true
+          tags: ${{ vars.DOCKERHUB_USERNAME }}/devboard-frontend:latest
