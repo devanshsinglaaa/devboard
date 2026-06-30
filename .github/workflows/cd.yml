@@ -10,15 +10,15 @@ on:
       - master
 
 jobs:
-  if: github.event.workflow_run.conclusion == 'success'
   deploy:
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
     runs-on: self-hosted
     steps:
       - name: Code Checkout
         uses: actions/checkout@v7
       
       - name: Copy example Env to Main Env
-        uses: cp .env.example .env
+        run: cp .env.example .env
       
       - name: Docker Setup [Login]
         uses: docker/login-action@v4
