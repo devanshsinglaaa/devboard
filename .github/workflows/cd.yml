@@ -4,10 +4,11 @@
 name: CD
 
 on:
-  workflow_run:
-    workflows: ["CI"]
-    branches:
-      - master
+  workflow_call:
+  # workflow_run:
+  #   workflows: ["CI"]
+  #   branches:
+  #     - master
 
 jobs:
   deploy:
