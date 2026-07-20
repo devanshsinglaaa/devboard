@@ -43,6 +43,7 @@ services:
       - "${BACKEND_HOST_PORT}:${BACKEND_PORT}"   # host:container — direct curl/debug; the UI uses the gateway
 
   frontend:
+  
     build: ./frontend
     image: trainwithshubham/devboard-frontend:${IMAGE_TAG:-latest}
     depends_on:
