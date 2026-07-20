@@ -28,6 +28,6 @@ jobs:
 
       - name: Deploy the containers using docker compose
         run: |
-          docker compose build --no-cache frontend
           docker compose pull
-          docker compose up -d --force-recreate --no-deps frontend
+          docker compose down
+          docker compose up -d
