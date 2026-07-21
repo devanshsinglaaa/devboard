@@ -1,5 +1,10 @@
+name: Go Linter
+
+on:
+  workflow_dispatch:
+
 jobs:
-  code-checkout:
+  code-checkout-and-build:
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
