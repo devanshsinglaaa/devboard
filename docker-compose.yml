@@ -8,7 +8,7 @@
 # variables get injected into the db and the backend.
 #
 # Bring it up:  docker compose up --build
-# Then open:    http://localhost:8080   (FRONTEND_HOST_PORT)
+# Then open:    http://localhost:8080  (FRONTEND_HOST_PORT)
 
 services:
   postgres:
