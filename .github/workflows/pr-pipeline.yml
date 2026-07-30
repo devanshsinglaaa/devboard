@@ -1,0 +1,38 @@
+name: Pull Request Pipeline
+
+on:
+  pull_request:
+    branches:
+      - master
+
+jobs:
+
+  build-test:
+    name: Build & Test
+
+    uses: ./.github/workflows/reusable-build-test.yml
+
+    with:
+      node_version: "20"
+      go_version: "1.23"
+      run_tests: true
+
+  pr-summary:
+    name: PR Summary
+
+    needs: build-test
+
+    runs-on: ubuntu-latest
+
+    steps:
+
+      - name: Generate Summary
+        run: |
+          echo "# 🚀 Pull Request Validation" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "## Checks Completed" >> $GITHUB_STEP_SUMMARY
+          echo "- ✅ Backend Build & Test" >> $GITHUB_STEP_SUMMARY
+          echo "- ✅ Frontend Build & Test" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### Result" >> $GITHUB_STEP_SUMMARY
+          echo "Status: **${{ needs.build-test.outputs.test_result }}**" >> $GITHUB_STEP_SUMMARY

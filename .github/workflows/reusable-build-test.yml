@@ -1,0 +1,117 @@
+name: Reusable Build & Test
+
+on:
+  workflow_call:
+    inputs:
+      node_version:
+        description: Node.js version
+        required: false
+        default: "20"
+        type: string
+
+      go_version:
+        description: Go version
+        required: false
+        default: "1.23"
+        type: string
+
+      run_tests:
+        description: Run test cases
+        required: false
+        default: true
+        type: boolean
+
+    outputs:
+      test_result:
+        description: Overall test status
+        value: ${{ jobs.summary.outputs.test_result }}
+
+jobs:
+
+  backend-test:
+    name: Backend Build & Test
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Setup Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: ${{ inputs.go_version }}
+
+      - name: Download Dependencies
+        working-directory: backend
+        run: go mod download
+
+      - name: Go Format
+        working-directory: backend
+        run: go fmt ./...
+
+      - name: Go Vet
+        working-directory: backend
+        run: go vet ./...
+
+      - name: Run Backend Tests
+        if: inputs.run_tests
+        working-directory: backend
+        run: go test ./...
+
+  frontend-test:
+    name: Frontend Build & Test
+    needs: backend-test
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ inputs.node_version }}
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Install Dependencies
+        working-directory: frontend
+        run: npm install
+
+      - name: Run ESLint
+        working-directory: frontend
+        run: npm run lint
+
+      - name: Run Vitest
+        if: inputs.run_tests
+        working-directory: frontend
+        run: npm test
+
+      - name: Build Frontend
+        working-directory: frontend
+        run: npm run build
+
+  summary:
+    name: Build Summary
+    needs:
+      - backend-test
+      - frontend-test
+
+    runs-on: ubuntu-latest
+
+    outputs:
+      test_result: ${{ steps.result.outputs.test_result }}
+
+    steps:
+      - name: Mark Success
+        id: result
+        run: |
+          echo "test_result=passed" >> $GITHUB_OUTPUT
+
+      - name: Workflow Summary
+        run: |
+          echo "## ✅ Build & Test Successful" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "- Backend checks passed" >> $GITHUB_STEP_SUMMARY
+          echo "- Frontend checks passed" >> $GITHUB_STEP_SUMMARY
+          echo "- Ready for Docker build" >> $GITHUB_STEP_SUMMARY

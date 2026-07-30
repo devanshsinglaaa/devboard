@@ -1,0 +1,56 @@
+name: Main Pipeline
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+
+  build-test:
+    name: Build & Test
+    uses: ./.github/workflows/reusable-build-test.yml
+
+    with:
+      node_version: "20"
+      go_version: "1.23"
+      run_tests: true
+
+  backend-docker:
+    name: Backend Docker
+
+    needs: build-test
+
+    uses: ./.github/workflows/reusable-docker.yml
+
+    with:
+      image_name: devboard-backend
+      context: ./backend
+      dockerfile: Dockerfile
+      tag: latest
+
+    secrets: inherit
+
+  frontend-docker:
+    name: Frontend Docker
+
+    needs: backend-docker
+
+    uses: ./.github/workflows/reusable-docker.yml
+
+    with:
+      image_name: devboard-frontend
+      context: ./frontend
+      dockerfile: Dockerfile
+      tag: latest
+
+    secrets: inherit
+
+  deploy:
+    name: Deploy
+
+    needs: frontend-docker
+
+    uses: ./.github/workflows/cd.yml
+
+    secrets: inherit
