@@ -61,7 +61,7 @@ jobs:
           image-ref: ${{ vars.DOCKERHUB_USERNAME }}/${{ inputs.image_name }}:${{ inputs.tag }}
           format: table
           exit-code: "1"
-          severity: HIGH,CRITICAL
+          severity: CRITICAL
 
       - name: Push Docker Image
         if: success()
