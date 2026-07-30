@@ -3,7 +3,7 @@ name: Main Pipeline
 on:
   push:
     branches:
-      - devboard-D48
+      - devboard-D49-DevSecOps
       # Day 48's branch.
 
 jobs:
