@@ -3,7 +3,7 @@ name: Main Pipeline
 on:
   push:
     branches:
-      - master
+      - devboard-D48
 
 jobs:
 
